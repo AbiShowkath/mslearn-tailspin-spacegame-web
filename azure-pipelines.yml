@@ -16,35 +16,56 @@ steps:
     packageType: sdk
     version: '$(dotnetSdkVersion)'
 
-- task: Npm@1
-  displayName: 'Run npm install'
+- task: Docker@2
+  displayName: 'Build Docker image'
   inputs:
-    verbose: false
-
-- script: '"./node_modules/.bin/sass" $(wwwrootDir) -I $(wwwrootDir)'
-  displayName: 'Compile Sass assets'
-
-- task: gulp@1
-  displayName: 'Run gulp tasks'
-
-- script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
-  displayName: 'Write build info'
-  workingDirectory: $(wwwrootDir)
-
-- task: DotNetCoreCLI@2
-  displayName: 'Restore project dependencies'
-  inputs:
-    command: 'restore'
-    projects: '**/*.csproj'
-
-- template: templates/build.yml
-  parameters:
-    buildConfiguration: 'Debug'
-
-- template: templates/build.yml
-  parameters:
-    buildConfiguration: 'Release'
+    command: build
+    Dockerfile: './Dockerfile'
+    tags: |
+      $(Build.BuildId)
+    repository: tailspin-spacegame-web
+    buildContext: .
+    arguments: '--pull'
+  
+- script: |
+    docker save tailspin-spacegame-web:$(Build.BuildId) -o $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar
+  displayName: 'Save Docker image to artifact staging directory'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
-  condition: succeeded()
+  displayName: 'Publish Docker Image Artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+
+  # - task: Npm@1
+#   displayName: 'Run npm install'
+#   inputs:
+#     verbose: false
+
+# - script: '"./node_modules/.bin/sass" $(wwwrootDir) -I $(wwwrootDir)'
+#   displayName: 'Compile Sass assets'
+
+# - task: gulp@1
+#   displayName: 'Run gulp tasks'
+
+# - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
+#   displayName: 'Write build info'
+#   workingDirectory: $(wwwrootDir)
+
+# - task: DotNetCoreCLI@2
+#   displayName: 'Restore project dependencies'
+#   inputs:
+#     command: 'restore'
+#     projects: '**/*.csproj'
+
+# - template: templates/build.yml
+#   parameters:
+#     buildConfiguration: 'Debug'
+
+# - template: templates/build.yml
+#   parameters:
+#     buildConfiguration: 'Release'
+
+# - task: PublishBuildArtifacts@1
+#   displayName: 'Publish Artifact: drop'
+#   condition: succeeded()
