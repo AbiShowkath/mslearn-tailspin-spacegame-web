@@ -20,7 +20,7 @@ variables:
   vmDiskSize: '8'
   vmsku: 'Premium_LRS'
   # storange name with randomly generated number suffixed, must be globally unique
-  storageAccount: 'spacegamestorage-$RANDOM'
+  storageAccount: 'spacegamestorage$RANDOM'
   storagesku: 'Standard_LRS'
   containerName: 'spacegamecontainer'
 
