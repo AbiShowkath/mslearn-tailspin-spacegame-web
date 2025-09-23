@@ -19,8 +19,6 @@ variables:
   vmDiskName: 'uploadDataDisk2'
   vmDiskSize: '8'
   vmsku: 'Premium_LRS'
-  # storange name with randomly generated number suffixed, must be globally unique
-  storageAccount: 'spacegamestorage$RANDOM'
   storagesku: 'Standard_LRS'
   containerName: 'spacegamecontainer'
 
@@ -70,10 +68,11 @@ steps:
       az vm create --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --admin-username ${{ variables.adminUserName }} --name ${{ variables.vmName }} --image ${{ variables.vmImage }} --generate-ssh-keys --verbose --size ${{ variables.vmSize }}
       
       echo "Creating storage account and container..."
-      az storage account create --name ${{ variables.storageAccount }} --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --sku ${{ variables.storagesku }}
+      STORAGE_ACCOUNT="spacegamestorage$RANDOM"
+      az storage account create --name $STORAGE_ACCOUNT --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --sku ${{ variables.storagesku }}
 
-      CONNECTION=$(az storage account show-connection-string --name ${{ variables.storageAccount }} --resource-group ${{ variables.resourceGroupName }} --query connectionString -o tsv)
-      
+      CONNECTION=$(az storage account show-connection-string --name $STORAGE_ACCOUNT --resource-group ${{ variables.resourceGroupName }} --query connectionString -o tsv)
+
       echo "Creating storage container..."
       az storage container create --name ${{ variables.containerName }} --connection-string $CONNECTION
 
