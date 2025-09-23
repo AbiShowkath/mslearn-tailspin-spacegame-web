@@ -65,40 +65,16 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
+      echo "Setting up Azure resources..."
       az group create --name ${{ variables.resourceGroupName }} --location ${{ variables.location }}
       az vm create --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --admin-username ${{ variables.adminUserName }} --name ${{ variables.vmName }} --image ${{ variables.vmImage }} --generate-ssh-keys --verbose --size ${{ variables.vmSize }}
-      az vm disk attach --resource-group ${{ variables.resourceGroupName }} --vm-name ${{ variables.vmName }} --name ${{ variables.vmDiskName }} --size-gb ${{ variables.vmDiskSize }} --sku ${{ variables.vmsku }} --new
+      
+      echo "Creating storage account and container..."
       az storage account create --name ${{ variables.storageAccount }} --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --sku ${{ variables.storagesku }}
-      az storage container create --name ${{ variables.containerName }} --account-name ${{ variables.storageAccount }} --public-access blob
 
-      storageKey=$(az storage account keys list --resource-group ${{ variables.resourceGroupName }} --account-name ${{ variables.storageAccount }} --query "[0].value" -o tsv)
-      az storage blob upload --account-name ${{ variables.storageAccount }} --account-key $storageKey --container-name ${{ variables.containerName }} --name tailspin-spacegame-web.tar --file $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar
+      CONNECTION=$(az storage account show-connection-string --name ${{ variables.storageAccount }} --resource-group ${{ variables.resourceGroupName }} --query connectionString -o tsv)
+      
+      echo "Creating storage container..."
+      az storage container create --name ${{ variables.containerName }} --connection-string $CONNECTION
 
-- task: AzureCLI@2
-  displayName: 'Install Docker on VM, Download Blob Image, and Run Container'
-  inputs:
-    azureSubscription: '${{ parameters.serviceConnection }}'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      ipaddress=$(az vm show --name ${{ variables.vmName }} --resource-group ${{ variables.resourceGroupName }} --show-details --query "publicIps" -o tsv)
-
-      ssh ${{ variables.adminUserName }}@$ipaddress << 'EOF'
-        sudo apt-get update
-        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update
-        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-        sudo systemctl start docker
-        sudo systemctl enable docker
-
-        export AZURE_STORAGE_ACCOUNT=${{ variables.storageAccount }}
-        export AZURE_STORAGE_KEY=$storageKey
-        azcopy copy "https://$AZURE_STORAGE_ACCOUNT.blob.core.windows.net/${{ variables.containerName }}/tailspin-spacegame-web.tar" ./tailspin-spacegame-web.tar
-        sudo docker load < tailspin-spacegame-web.tar
-        sudo docker run -d -p 80:80 tailspin-spacegame-web:$(Build.BuildId)
-      EOF
-
-      echo "Application is accessible at http://$ipaddress"
-
+      az storage blob upload --container-name ${{ variables.containerName }} --file $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar --name tailspin-spacegame-web-$(Build.BuildId).tar --connection-string $CONNECTION
