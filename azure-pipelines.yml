@@ -24,7 +24,7 @@ variables:
   # containerName: 'spacegamecontainer'
 
   # azureServiceConnection: 'myServiceConnection'
-  templateFile: 'storage.bicep'
+  templateFile: 'bicep/storage.bicep'
 
 pool:
   vmImage: $(vmImageName)
