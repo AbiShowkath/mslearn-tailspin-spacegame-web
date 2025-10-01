@@ -1,26 +1,33 @@
 trigger:
 - '*'
 
-pool:
-  vmImage: ubuntu-latest
+name: Deploy Bicep files
 
 variables:
-  buildConfiguration: 'Release'
-  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-  dotnetSdkVersion: '8.0.x'
+  vmImageName: 'ubuntu-latest'
+
+  # buildConfiguration: 'Release'
+  # wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+  # dotnetSdkVersion: '8.0.x'
 
   # Azure Resource Variables
   resourceGroupName: 'SpaceGameResourceGroup'
   location: 'eastus'
-  adminUserName: 'abishowkathazurewebuser'
-  vmName: 'SpaceGameVM'
-  vmImage: 'Ubuntu2204'
-  vmSize: 'Standard_B1s'
-  vmDiskName: 'uploadDataDisk2'
-  vmDiskSize: '8'
-  vmsku: 'Premium_LRS'
-  storagesku: 'Standard_LRS'
-  containerName: 'spacegamecontainer'
+  # adminUserName: 'abishowkathazurewebuser'
+  # vmName: 'SpaceGameVM'
+  # vmImage: 'Ubuntu2204'
+  # vmSize: 'Standard_B1s'
+  # vmDiskName: 'uploadDataDisk2'
+  # vmDiskSize: '8'
+  # vmsku: 'Premium_LRS'
+  # storagesku: 'Standard_LRS'
+  # containerName: 'spacegamecontainer'
+
+  # azureServiceConnection: 'myServiceConnection'
+  templateFile: 'storage.bicep'
+
+pool:
+  vmImage: $(vmImageName)
 
 parameters:
 - name: serviceConnection
@@ -29,51 +36,12 @@ parameters:
   default: azure-subscription-1
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-  inputs:
-    packageType: sdk
-    version: '$(dotnetSdkVersion)'
-
-- task: Docker@2
-  displayName: 'Build Docker image'
-  inputs:
-    command: build
-    Dockerfile: './Dockerfile'
-    tags: |
-      $(Build.BuildId)
-    repository: tailspin-spacegame-web
-    buildContext: .
-    arguments: '--pull'
-
-- script: |
-    docker save tailspin-spacegame-web:$(Build.BuildId) -o $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar
-  displayName: 'Save Docker image to artifact staging directory'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Docker Image Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-
-- task: AzureCLI@2
-  displayName: 'Setup Azure Resources'
-  inputs:
-    azureSubscription: '${{ parameters.serviceConnection }}'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      echo "Setting up Azure resources..."
-      az group create --name ${{ variables.resourceGroupName }} --location ${{ variables.location }}
-      az vm create --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --admin-username ${{ variables.adminUserName }} --name ${{ variables.vmName }} --image ${{ variables.vmImage }} --generate-ssh-keys --verbose --size ${{ variables.vmSize }}
-      
-      echo "Creating storage account and container..."
-      STORAGE_ACCOUNT="spacegamestorage$RANDOM"
-      az storage account create --name $STORAGE_ACCOUNT --resource-group ${{ variables.resourceGroupName }} --location ${{ variables.location }} --sku ${{ variables.storagesku }}
-
-      CONNECTION=$(az storage account show-connection-string --name $STORAGE_ACCOUNT --resource-group ${{ variables.resourceGroupName }} --query connectionString -o tsv)
-
-      echo "Creating storage container..."
-      az storage container create --name ${{ variables.containerName }} --connection-string $CONNECTION
-
-      az storage blob upload --container-name ${{ variables.containerName }} --file $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar --name tailspin-spacegame-web-$(Build.BuildId).tar --connection-string $CONNECTION
+    - task: AzureCLI@2
+      inputs:
+          azureSubscription: '${{ parameters.serviceConnection }}'
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az --version
+            az group create --name ${{ variables.resourceGroupName }} --location ${{ variables.location }}
+            az deployment group create --resource-group ${{ variables.resourceGroupName }} --template-file ${{ variables.templateFile }}
