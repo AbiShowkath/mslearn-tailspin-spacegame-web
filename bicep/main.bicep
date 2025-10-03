@@ -64,6 +64,8 @@ param vmName string = '${namePrefix}VM'
 ])
 param securityType string = 'TrustedLaunch'
 
+param storageAccountType string = 'Standard_LRS'
+
 var storageAccountName = '${namePrefix}${uniqueString(resourceGroup().id)}'
 var nicName = '${namePrefix}Nic'
 var addressPrefix = '10.0.0.0/16'
@@ -88,7 +90,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
   location: location
   sku: {
-    name: 'Standard_LRS'
+    name: storageAccountType
   }
   kind: 'Storage'
 }
@@ -199,7 +201,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: 'StandardSSD_LRS'
+          storageAccountType: 'Standard_D2s_v5'
         }
       }
       dataDisks: [
