@@ -201,7 +201,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: 'Standard_D2s_v5'
+          storageAccountType: storageAccountType
         }
       }
       dataDisks: [
