@@ -24,7 +24,8 @@ variables:
   # containerName: 'spacegamecontainer'
 
   # azureServiceConnection: 'myServiceConnection'
-  templateFile: 'bicep/storage.bicep'
+  templateFile: 'bicep/main.bicep'
+  csmParametersFile: 'bicep/main.bicepparam'
 
 pool:
   vmImage: $(vmImageName)
@@ -36,12 +37,17 @@ parameters:
   default: azure-subscription-1
 
 steps:
-    - task: AzureCLI@2
+    - task: AzureResourceManagerTemplateDeployment@3
       inputs:
-          azureSubscription: '${{ parameters.serviceConnection }}'
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az --version
-            az group create --name ${{ variables.resourceGroupName }} --location ${{ variables.location }}
-            az deployment group create --resource-group ${{ variables.resourceGroupName }} --template-file ${{ variables.templateFile }}
+        deploymentScope: 'Resource Group'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(resourceGroupName)'
+        location: '$(location)'
+        templateLocation: 'Linked artifact'
+        csmFile: '$(templateFile)'
+        csmParametersFile: '$(csmParametersFile)'
+        overrideParameters: '-storageAccountType Standard_LRS'
+        deploymentMode: 'Incremental'
+        deploymentName: 'DeployPipelineTemplate'
+        connectedServiceName: '${{ parameters.azureServiceConnection }}'
+
