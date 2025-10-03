@@ -49,5 +49,5 @@ steps:
         overrideParameters: '-storageAccountType Standard_LRS'
         deploymentMode: 'Incremental'
         deploymentName: 'DeployPipelineTemplate'
-        connectedServiceName: '${{ parameters.azureServiceConnection }}'
+        connectedServiceName: '${{ parameters.serviceConnection }}'
 
