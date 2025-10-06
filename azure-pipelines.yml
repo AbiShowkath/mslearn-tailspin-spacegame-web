@@ -55,8 +55,8 @@ steps:
         connectedServiceName: '${{ parameters.serviceConnection }}'
     
     - script: |
-        echo "##vso[task.setvariable variable=acrName]$($deployBicep.outputs['acrName'])"
-        echo "##vso[task.setvariable variable=hostname]$($deployBicep.outputs['hostname'])"
+        echo "##vso[task.setvariable variable=acrName]$($deployBicep.acrName)"
+        echo "##vso[task.setvariable variable=hostname]$($deployBicep.hostname)"
         echo "ACR Name: $(acrName)"
         echo "Hostname: $(hostname)"
       displayName: 'Set bicep outputs as pipeline variables'
