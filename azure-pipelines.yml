@@ -72,12 +72,14 @@ steps:
         arguments: '--pull'
 
     - script: |
-        docker save tailspin-spacegame-web:$(Build.BuildId) -o $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar
-      displayName: 'Save Docker image to artifact staging directory'
+        docker tag tailspin-spacegame-web:$(Build.BuildId) spacegameacr001.azurecr.io/tailspin-spacegame-web:$(Build.BuildId)
+      displayName: 'Tag Docker image for ACR'
 
     - task: Docker@2
       displayName: 'Push Docker Image Artifact to ACR'
       inputs:
         command: push
         containerRegistry: 'spacegameacr001'
-        repository: '$(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar'
+        repository: 'tailspin-spacegame-web'
+        tags: |
+          $(Build.BuildId)
