@@ -80,6 +80,4 @@ steps:
       inputs:
         command: push
         containerRegistry: 'spacegameacr001'
-        repository: 'tailspin-spacegame-web'
-        tags: |
-          $(Build.BuildId)
+        repository: '$(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar'
