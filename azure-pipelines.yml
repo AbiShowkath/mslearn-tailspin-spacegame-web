@@ -79,7 +79,7 @@ steps:
       displayName: 'Push Docker Image Artifact to ACR'
       inputs:
         command: push
-        containerRegistry: '3ce7f1e6-ae95-4007-942b-4c8997e89354'
+        containerRegistry: '${{ parameters.serviceConnection }}'
         repository: 'tailspin-spacegame-web'
         tags: |
           $(Build.BuildId)
