@@ -6,9 +6,9 @@ name: Deploy Bicep files
 variables:
   vmImageName: 'ubuntu-latest'
 
-  # buildConfiguration: 'Release'
-  # wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-  # dotnetSdkVersion: '8.0.x'
+  buildConfiguration: 'Release'
+  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+  dotnetSdkVersion: '8.0.x'
 
   # Azure Resource Variables
   resourceGroupName: 'SpaceGameResourceGroup'
@@ -23,9 +23,10 @@ variables:
   # storagesku: 'Standard_LRS'
   # containerName: 'spacegamecontainer'
 
-  # azureServiceConnection: 'myServiceConnection'
   templateFile: 'bicep/main.bicep'
   csmParametersFile: 'bicep/main.bicepparam'
+  acrName: ''
+  hostname: ''
 
 pool:
   vmImage: $(vmImageName)
@@ -38,6 +39,8 @@ parameters:
 
 steps:
     - task: AzureResourceManagerTemplateDeployment@3
+      name: deployBicep
+      displayName: 'Deploy Bicep Template'
       inputs:
         deploymentScope: 'Resource Group'
         action: 'Create Or Update Resource Group'
@@ -50,4 +53,39 @@ steps:
         deploymentMode: 'Incremental'
         deploymentName: 'DeployPipelineTemplate'
         connectedServiceName: '${{ parameters.serviceConnection }}'
+    
+    - script: |
+        echo "##vso[task.setvariable variable=acrName]$(deployBicep.outputs.acrLoginServer)"
+        echo "##vso[task.setvariable variable=hostname]$(deployBicep.outputs.hostname)"
+        echo "ACR Name: $(acrName)"
+        echo "Hostname: $(hostname)"
+      displayName: 'Set bicep outputs as pipeline variables'
 
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+      inputs:
+        packageType: sdk
+        version: '$(dotnetSdkVersion)'
+
+    - task: Docker@2
+      displayName: 'Build Docker image'
+      inputs:
+        command: build
+        Dockerfile: './Dockerfile'
+        tags: |
+          $(Build.BuildId)
+        repository: tailspin-spacegame-web
+        buildContext: .
+        arguments: '--pull'
+
+    - script: |
+        docker save tailspin-spacegame-web:$(Build.BuildId) -o $(Build.ArtifactStagingDirectory)/tailspin-spacegame-web-$(Build.BuildId).tar
+      displayName: 'Save Docker image to artifact staging directory'
+
+    - task: Docker@2
+      displayName: 'Push Docker Image Artifact to ACR'
+      inputs:
+        containerRegistry: '$(acrName)'
+        repository: 'tailspin-spacegame-web'
+        tags: |
+          $(Build.BuildId)
