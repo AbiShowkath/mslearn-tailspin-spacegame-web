@@ -72,7 +72,7 @@ steps:
         arguments: '--pull'
 
     - script: |
-        docker tag tailspin-spacegame-web:$(Build.BuildId) spacegameacr001.azurecr.io/tailspin-spacegame-web:$(Build.BuildId)
+        docker tag tailspin-spacegame-web:$(Build.BuildId) ***/tailspin-spacegame-web:$(Build.BuildId)
       displayName: 'Tag Docker image for ACR'
 
     - task: Docker@2
@@ -80,6 +80,6 @@ steps:
       inputs:
         command: push
         containerRegistry: 'spacegameacr001'
-        repository: 'spacegameacr001.azurecr.io/tailspin-spacegame-web'
+        repository: '***/tailspin-spacegame-web'
         tags: |
           $(Build.BuildId)
