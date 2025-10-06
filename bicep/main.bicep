@@ -267,4 +267,4 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
 }
 
 output hostname string = publicIp.properties.dnsSettings.fqdn
-output acrLoginServer string = acrResource.properties.loginServer
+output acrName string = acrResource.properties.loginServer
