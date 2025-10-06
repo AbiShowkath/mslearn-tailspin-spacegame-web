@@ -25,7 +25,7 @@ variables:
 
   templateFile: 'bicep/main.bicep'
   csmParametersFile: 'bicep/main.bicepparam'
-  acrName: 'spacegameacr2024'
+  acrName: 'spacegameacr2vmusczn7ciw2'
   hostname: ''
 
 pool:
