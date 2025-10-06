@@ -57,6 +57,11 @@ param location string = resourceGroup().location
 @description('Name of the virtual machine.')
 param vmName string = '${namePrefix}VM'
 
+@minLength(5)
+@maxLength(50)
+@description('Provide a globally unique name of your Azure Container Registry')
+param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
+
 @description('Security Type of the Virtual Machine.')
 @allowed([
   'Standard'
@@ -247,6 +252,17 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
         }
       }
     }
+  }
+}
+
+resource acrResource 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
+  name: acrName
+  location: location
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    adminUserEnabled: true
   }
 }
 
