@@ -80,6 +80,6 @@ steps:
       inputs:
         command: push
         containerRegistry: 'spacegameacr001'
-        repository: 'tailspin-spacegame-web'
+        repository: 'spacegameacr001.azurecr.io/tailspin-spacegame-web'
         tags: |
           $(Build.BuildId)
