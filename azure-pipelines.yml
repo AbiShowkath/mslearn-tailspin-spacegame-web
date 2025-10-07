@@ -81,6 +81,6 @@ steps:
         Dockerfile: './Dockerfile'
         tags: |
           $(Build.BuildId)
-        repository: 'spacegamewebacr2vmusczn7ciw2.azurecr.io/tailspin-spacegame-web'
+        repository: '$(acrName).azurecr.io/tailspin-spacegame-web'
         buildContext: .
         arguments: '--pull'

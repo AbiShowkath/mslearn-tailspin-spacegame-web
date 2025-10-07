@@ -133,16 +133,16 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-0
   properties: {
     securityRules: [
       {
-        name: 'SSH'
+        name: 'default-allow-3389'
         properties: {
           priority: 1000
-          protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: '*'
+          destinationPortRange: '3389'
+          protocol: 'Tcp'
           sourcePortRange: '*'
+          sourceAddressPrefix: '*'
           destinationAddressPrefix: '*'
-          destinationPortRange: '22'
         }
       }
     ]
@@ -162,12 +162,10 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
       {
         name: subnetName
         properties: {
+          addressPrefix: subnetAddressPrefix
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
     ]
@@ -249,7 +247,7 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
     name: 'Basic'
   }
   properties: {
-    adminUserEnabled: true
+    adminUserEnabled: false
   }
 }
 
