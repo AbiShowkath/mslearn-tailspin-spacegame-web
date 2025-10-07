@@ -52,17 +52,21 @@ steps:
         csmParametersFile: '$(csmParametersFile)'
         # overrideParameters: '-acrName $(acrName)'
         deploymentMode: 'Incremental'
-        deploymentName: 'DeployPipelineTemplate'
+        deploymentName: 'deployPipelineTemplate'
         connectedServiceName: '${{ parameters.serviceConnection }}'
     
-    - script: |
-        echo "##vso[task.setvariable variable=vmName]$(DeployPipelineTemplate.outputs['vmName'])"
-        echo "##vso[task.setvariable variable=acrName]$(DeployPipelineTemplate.outputs['acrName'])"
-      displayName: 'Set VM info as pipeline variables'
+    - task: AzureCLI@2
+      displayName: 'Get Outputs'
+      inputs:
+        azureSubscription: '${{ parameters.serviceConnection }}'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "##vso[task.setvariable variable=vmName]$(az deployment group show --resource-group $(resourceGroupName) --name deployPipelineTemplate --query properties.outputs.vmName.value -o tsv)"
+          echo "##vso[task.setvariable variable=hostname]$(az deployment group show --resource-group $(resourceGroupName) --name deployPipelineTemplate --query properties.outputs.hostname.value -o tsv)"
+          echo "VM Name: $(vmName)"
+          echo "Hostname: $(hostname)"
 
-
-
-    
     # - task: UseDotNet@2
     #   displayName: 'Use .NET SDK $(dotnetSdkVersion)'
     #   inputs:
