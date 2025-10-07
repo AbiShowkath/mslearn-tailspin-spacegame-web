@@ -244,7 +244,7 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
   name: acrName
   location: location
   sku: {
-    name: 'Standard'
+    name: 'Basic'
   }
   properties: {
     adminUserEnabled: true

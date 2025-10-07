@@ -1,6 +1,6 @@
 using './main_linux.bicep'
 
-param namePrefix = 'spacegameweb'
+param namePrefix = 'spacewebgame'
 param vmName = '${namePrefix}VM'
 param adminUsername = 'abishowkathlinuxuser'
 param authenticationType = 'password'

@@ -50,7 +50,7 @@ steps:
         templateLocation: 'Linked artifact'
         csmFile: '$(templateFile)'
         csmParametersFile: '$(csmParametersFile)'
-        # overrideParameters: '-acrName $(acrName)'
+        overrideParameters: '-acrName $(acrName)'
         deploymentMode: 'Incremental'
         deploymentName: 'deployPipelineTemplate'
         connectedServiceName: '${{ parameters.serviceConnection }}'
