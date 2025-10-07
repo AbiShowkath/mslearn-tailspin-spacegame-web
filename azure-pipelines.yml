@@ -25,7 +25,8 @@ variables:
 
   templateFile: 'bicep/main.bicep'
   csmParametersFile: 'bicep/main.bicepparam'
-  acrName: 'spacegameacr2vmusczn7ciw2'
+  acrName: 'spacegameacr2vmusczn7ciw3'
+  vmName: ''
   hostname: ''
 
 pool:
@@ -49,25 +50,33 @@ steps:
         templateLocation: 'Linked artifact'
         csmFile: '$(templateFile)'
         csmParametersFile: '$(csmParametersFile)'
-        overrideParameters: '-acrName $(acrName)'
+        # overrideParameters: '-acrName $(acrName)'
         deploymentMode: 'Incremental'
         deploymentName: 'DeployPipelineTemplate'
         connectedServiceName: '${{ parameters.serviceConnection }}'
     
-    - task: UseDotNet@2
-      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-      inputs:
-        packageType: sdk
-        version: '$(dotnetSdkVersion)'
+    - script: |
+        echo "##vso[task.setvariable variable=vmName]$(DeployPipelineTemplate.outputs['vmName'])"
+        echo "##vso[task.setvariable variable=acrName]$(DeployPipelineTemplate.outputs['acrName'])"
+      displayName: 'Set VM info as pipeline variables'
 
-    - task: Docker@2
-      displayName: 'Build Docker image'
-      inputs:
-        command: buildAndPush
-        containerRegistry: 'spacegameacr001'
-        Dockerfile: './Dockerfile'
-        tags: |
-          $(Build.BuildId)
-        repository: 'spacegameacr2vmusczn7ciw2.azurecr.io/tailspin-spacegame-web'
-        buildContext: .
-        arguments: '--pull'
+
+
+    
+    # - task: UseDotNet@2
+    #   displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+    #   inputs:
+    #     packageType: sdk
+    #     version: '$(dotnetSdkVersion)'
+
+    # - task: Docker@2
+    #   displayName: 'Build Docker image'
+    #   inputs:
+    #     command: buildAndPush
+    #     containerRegistry: 'spacegameacr001'
+    #     Dockerfile: './Dockerfile'
+    #     tags: |
+    #       $(Build.BuildId)
+    #     repository: '$(acrName).azurecr.io/tailspin-spacegame-web'
+    #     buildContext: .
+    #     arguments: '--pull'
