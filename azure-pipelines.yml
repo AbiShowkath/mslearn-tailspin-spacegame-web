@@ -77,7 +77,7 @@ steps:
       displayName: 'Build Docker image'
       inputs:
         command: buildAndPush
-        containerRegistry: 'spacegameacr001'
+        containerRegistry: 'spacegamewebacr001'
         Dockerfile: './Dockerfile'
         tags: |
           $(Build.BuildId)
