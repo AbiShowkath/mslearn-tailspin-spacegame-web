@@ -133,16 +133,16 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-0
   properties: {
     securityRules: [
       {
-        name: 'default-allow-3389'
+        name: 'SSH'
         properties: {
           priority: 1000
+          protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
-          destinationPortRange: '3389'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
           sourceAddressPrefix: '*'
+          sourcePortRange: '*'
           destinationAddressPrefix: '*'
+          destinationPortRange: '22'
         }
       }
     ]
@@ -244,7 +244,7 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
   name: acrName
   location: location
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
   properties: {
     adminUserEnabled: true
