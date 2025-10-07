@@ -67,20 +67,20 @@ steps:
           echo "VM Name: $(vmName)"
           echo "ACR Name: $(acrName)"
 
-    - task: UseDotNet@2
-      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-      inputs:
-        packageType: sdk
-        version: '$(dotnetSdkVersion)'
+    # - task: UseDotNet@2
+    #   displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+    #   inputs:
+    #     packageType: sdk
+    #     version: '$(dotnetSdkVersion)'
 
-    - task: Docker@2
-      displayName: 'Build Docker image'
-      inputs:
-        command: buildAndPush
-        containerRegistry: 'spacegameacr001'
-        Dockerfile: './Dockerfile'
-        tags: |
-          $(Build.BuildId)
-        repository: '$(acrName).azurecr.io/tailspin-spacegame-web'
-        buildContext: .
-        arguments: '--pull'
+    # - task: Docker@2
+    #   displayName: 'Build Docker image'
+    #   inputs:
+    #     command: buildAndPush
+    #     containerRegistry: 'spacegameacr001'
+    #     Dockerfile: './Dockerfile'
+    #     tags: |
+    #       $(Build.BuildId)
+    #     repository: '$(acrName).azurecr.io/tailspin-spacegame-web'
+    #     buildContext: .
+    #     arguments: '--pull'

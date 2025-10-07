@@ -54,6 +54,9 @@ param securityType string = 'TrustedLaunch'
 @description('Provide a globally unique name of your Azure Container Registry')
 param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
 
+@description('Allocation method for the Public IP used to access the Virtual Machine.')
+param publicIPAllocationMethod string = 'Static'
+
 var imageReference = {
   'Ubuntu-2004': {
     publisher: 'Canonical'
@@ -175,12 +178,10 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
     name: 'Basic'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
-    publicIPAddressVersion: 'IPv4'
+    publicIPAllocationMethod: publicIPAllocationMethod
     dnsSettings: {
       domainNameLabel: dnsLabelPrefix
     }
-    idleTimeoutInMinutes: 4
   }
 }
 
