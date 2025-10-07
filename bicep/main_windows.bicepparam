@@ -1,4 +1,4 @@
-using './main.bicep'
+using './main_windows.bicep'
 
 param namePrefix = 'spacegame'
 param adminUsername = 'abishowkathazureuser'
