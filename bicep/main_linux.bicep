@@ -57,6 +57,9 @@ param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
 @description('Allocation method for the Public IP used to access the Virtual Machine.')
 param publicIPAllocationMethod string = 'Static'
 
+@description('SKU for the Public IP used to access the Virtual Machine.')
+param publicIpSku string = 'Standard'
+
 var imageReference = {
   'Ubuntu-2004': {
     publisher: 'Canonical'
@@ -175,7 +178,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   name: publicIPAddressName
   location: location
   sku: {
-    name: 'Basic'
+    name: publicIpSku
   }
   properties: {
     publicIPAllocationMethod: publicIPAllocationMethod
