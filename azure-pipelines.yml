@@ -77,10 +77,10 @@ steps:
       displayName: 'Build Docker image'
       inputs:
         command: buildAndPush
-        containerRegistry: 'spacegamewebacr001'
+        containerRegistry: 'spacegameacr002'
         Dockerfile: './Dockerfile'
         tags: |
           $(Build.BuildId)
-        repository: '$(acrName).azurecr.io/tailspin-spacegame-web'
+        repository: 'tailspin-spacegame-web'
         buildContext: .
         arguments: '--pull'
