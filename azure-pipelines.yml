@@ -6,6 +6,8 @@ name: Deploy Bicep files
 variables:
   vmImageName: 'ubuntu-latest'
 
+  system.debug: true
+
   buildConfiguration: 'Release'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
   dotnetSdkVersion: '8.0.x'
