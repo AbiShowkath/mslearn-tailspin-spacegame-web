@@ -7,7 +7,7 @@ variables:
   namePrefix: 'spacewebgame'
   vmImageName: 'ubuntu-latest'
 
-  system.debug: true
+  # system.debug: true
 
   buildConfiguration: 'Release'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
@@ -62,15 +62,15 @@ steps:
       displayName: 'Get Outputs'
       inputs:
         azureSubscription: '${{ parameters.serviceConnection }}'
-        scriptType: 'bash'
+        scriptType: 'ps'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.vmName.value -o tsv
-          echo "##vso[task.setvariable variable=vmName]$(az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.vmName.value -o tsv)"
-          echo "VM Name: $(vmName)"
-          az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.acrName.value -o tsv
-          echo "##vso[task.setvariable variable=acrName]$(az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.acrName.value -o tsv)"
-          echo "ACR Name: $(acrName)"
+          $vmName = az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.vmName.value -o tsv
+          echo "##vso[task.setvariable variable=vmName]$vmName"
+          echo "VM Name: $vmName"
+          $acrName = az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.acrName.value -o tsv
+          echo "##vso[task.setvariable variable=acrName]$acrName"
+          echo "ACR Name: $acrName"
 
     # - task: UseDotNet@2
     #   displayName: 'Use .NET SDK $(dotnetSdkVersion)'
