@@ -1,10 +1,11 @@
 using './main_linux.bicep'
 
-param namePrefix = 'spacewebgame'
+var subscriptionId = '3ce7f1e6-ae95-4007-942b-4c8997e89354'
+param namePrefix = 'spacegame'
 param vmName = '${namePrefix}VM'
 param adminUsername = 'abishowkathlinuxuser'
 param authenticationType = 'password'
-param adminPasswordOrKey = 'abishowkathlinux@0987'
+param adminPasswordOrKey = 'abishowkathaz@4321'
 param dnsLabelPrefix = toLower('${namePrefix}dns')
 param ubuntuOSVersion = 'Ubuntu-2204'
 param vmSize = 'Standard_B1s'
