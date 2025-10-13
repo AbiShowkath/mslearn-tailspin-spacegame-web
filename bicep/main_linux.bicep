@@ -115,8 +115,25 @@ module network 'modules/network.bicep' = {
   }
 }
 
-var networkInterfaceId = network.outputs.networkInterfaceId
+var networkSubnetId = network.outputs.networkSubnetId
 var networkSecurityGroupId = network.outputs.networkSecurityGroupId
+
+module nic_ip 'modules/nic_ip.bicep' = {
+  name: 'nicIpModule'
+  params: {
+    location: location
+    networkSubnetId: networkSubnetId
+    networkInterfaceName: networkInterfaceName
+    networkSecurityGroupId: networkSecurityGroupId
+    publicIPAddressName: publicIPAddressName
+    publicIpSku: publicIpSku
+    publicIPAllocationMethod: publicIPAllocationMethod
+    dnsLabelPrefix: dnsLabelPrefix
+  }
+}
+
+var networkInterfaceId = nic_ip.outputs.networkInterfaceId
+var publicIPAddress = nic_ip.outputs.publicIPAddressFqdn
 
 module compute 'modules/compute.bicep' = {
   name: 'computeModule'
@@ -128,7 +145,7 @@ module compute 'modules/compute.bicep' = {
     authenticationType: authenticationType
     vmSize: vmSize
     ubuntuOSVersion: ubuntuOSVersion
-    networkInterfaceId: network.outputs.networkInterfaceId
+    networkInterfaceId: networkInterfaceId
     securityType: securityType
     osDiskType: osDiskType
     extensionName: extensionName
@@ -139,158 +156,47 @@ module compute 'modules/compute.bicep' = {
   }
 }
 
-output vmId string = compute.outputs.vmId
-
-resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
-  name: networkInterfaceName
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          subnet: {
-            id: networkInterfaceId
-          }
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIPAddress.id
-          }
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: networkSecurityGroupId
-    }
-  }
-}
-
-// resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
-//   name: networkSecurityGroupName
+// resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
+//   name: networkInterfaceName
 //   location: location
 //   properties: {
-//     securityRules: [
+//     ipConfigurations: [
 //       {
-//         name: 'SSH'
+//         name: 'ipconfig1'
 //         properties: {
-//           priority: 1000
-//           protocol: 'Tcp'
-//           access: 'Allow'
-//           direction: 'Inbound'
-//           sourceAddressPrefix: '*'
-//           sourcePortRange: '*'
-//           destinationAddressPrefix: '*'
-//           destinationPortRange: '22'
-//         }
-//       }
-//     ]
-//   }
-// }
-
-// resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
-//   name: virtualNetworkName
-//   location: location
-//   properties: {
-//     addressSpace: {
-//       addressPrefixes: [
-//         addressPrefix
-//       ]
-//     }
-//     subnets: [
-//       {
-//         name: subnetName
-//         properties: {
-//           addressPrefix: subnetAddressPrefix
-//           networkSecurityGroup: {
-//             id: networkSecurityGroup.id
+//           subnet: {
+//             id: networkSubnetId
+//           }
+//           privateIPAllocationMethod: 'Dynamic'
+//           publicIPAddress: {
+//             id: publicIPAddress.id
 //           }
 //         }
 //       }
 //     ]
-//   }
-// }
-
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
-  name: publicIPAddressName
-  location: location
-  sku: {
-    name: publicIpSku
-  }
-  properties: {
-    publicIPAllocationMethod: publicIPAllocationMethod
-    dnsSettings: {
-      domainNameLabel: dnsLabelPrefix
-    }
-  }
-}
-
-// resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
-//   name: vmName
-//   location: location
-//   properties: {
-//     hardwareProfile: {
-//       vmSize: vmSize
-//     }
-//     storageProfile: {
-//       osDisk: {
-//         createOption: 'FromImage'
-//         managedDisk: {
-//           storageAccountType: osDiskType
-//         }
-//       }
-//       imageReference: imageReference[ubuntuOSVersion]
-//     }
-//     networkProfile: {
-//       networkInterfaces: [
-//         {
-//           id: networkInterface.id
-//         }
-//       ]
-//     }
-//     osProfile: {
-//       computerName: vmName
-//       adminUsername: adminUsername
-//       adminPassword: adminPasswordOrKey
-//       linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
-//     }
-//     securityProfile: (securityType == 'TrustedLaunch') ? securityProfileJson : null
-//   }
-// }
-
-// resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if (securityType == 'TrustedLaunch' && securityProfileJson.uefiSettings.secureBootEnabled && securityProfileJson.uefiSettings.vTpmEnabled) {
-//   parent: vm
-//   name: extensionName
-//   location: location
-//   properties: {
-//     publisher: extensionPublisher
-//     type: extensionName
-//     typeHandlerVersion: extensionVersion
-//     autoUpgradeMinorVersion: true
-//     enableAutomaticUpgrade: true
-//     settings: {
-//       AttestationConfig: {
-//         MaaSettings: {
-//           maaEndpoint: maaEndpoint
-//           maaTenantName: maaTenantName
-//         }
-//       }
+//     networkSecurityGroup: {
+//       id: networkSecurityGroupId
 //     }
 //   }
 // }
 
-// resource acrResource 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
-//   name: acrName
+// resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+//   name: publicIPAddressName
 //   location: location
 //   sku: {
-//     name: 'Basic'
+//     name: publicIpSku
 //   }
 //   properties: {
-//     adminUserEnabled: true
+//     publicIPAllocationMethod: publicIPAllocationMethod
+//     dnsSettings: {
+//       domainNameLabel: dnsLabelPrefix
+//     }
 //   }
 // }
 
+output vmId string = compute.outputs.vmId
 output vmName string = compute.outputs.vmName
 // output acrName string = acrResource.name
 output adminUsername string = adminUsername
-output hostname string = publicIPAddress.properties.dnsSettings.fqdn
-output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress.properties.dnsSettings.fqdn}'
+output hostname string = publicIPAddress
+output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress}'

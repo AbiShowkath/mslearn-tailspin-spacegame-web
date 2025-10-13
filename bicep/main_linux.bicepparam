@@ -1,6 +1,6 @@
 using './main_linux.bicep'
 
-var subscriptionId = '3ce7f1e6-ae95-4007-942b-4c8997e89354'
+// var subscriptionId = '3ce7f1e6-ae95-4007-942b-4c8997e89354'
 param namePrefix = 'spacegame'
 param vmName = '${namePrefix}VM'
 param adminUsername = 'abishowkathlinuxuser'

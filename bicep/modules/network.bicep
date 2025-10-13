@@ -52,4 +52,4 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
 
 output virtualNetworkId string = virtualNetwork.id
 output networkSecurityGroupId string = networkSecurityGroup.id
-output networkInterfaceId string = virtualNetwork.properties.subnets[0].id
+output networkSubnetId string = virtualNetwork.properties.subnets[0].id

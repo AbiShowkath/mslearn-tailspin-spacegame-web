@@ -26,8 +26,10 @@ variables:
   # storagesku: 'Standard_LRS'
   # containerName: 'spacegamecontainer'
 
-  templateFile: 'bicep/main_linux.bicep'
-  csmParametersFile: 'bicep/main_linux.bicepparam'
+  # Bicep files
+  deploymentName: 'main_linux'
+  templateFile: 'bicep/$(deploymentName).bicep'
+  csmParametersFile: 'bicep/$(deploymentName).bicepparam'
   acrName: ''
   vmName: ''
   hostname: ''
@@ -43,7 +45,6 @@ parameters:
 
 steps:
     - task: AzureResourceManagerTemplateDeployment@3
-      name: main_linux
       displayName: 'Deploy Bicep Template'
       inputs:
         deploymentScope: 'Resource Group'
@@ -55,7 +56,7 @@ steps:
         csmParametersFile: '$(csmParametersFile)'
         overrideParameters: '-namePrefix $(namePrefix)'
         deploymentMode: 'Incremental'
-        deploymentName: 'deployPipelineTemplate'
+        deploymentName: '$(deploymentName)'
         connectedServiceName: '${{ parameters.serviceConnection }}'
     
     - task: AzureCLI@2
@@ -65,12 +66,12 @@ steps:
         scriptType: 'ps'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          $vmName = az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.vmName.value -o tsv
-          echo "##vso[task.setvariable variable=vmName]$vmName"
-          echo "VM Name: $vmName"
-          $acrName = az deployment group show --resource-group $(resourceGroupName) --name main_linux --query properties.outputs.acrName.value -o tsv
-          echo "##vso[task.setvariable variable=acrName]$acrName"
-          echo "ACR Name: $acrName"
+          $vmNameOutput = az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.vmName.value -o tsv
+          echo "##vso[task.setvariable variable=vmName]$vmNameOutput"
+          echo "VM Name: $vmNameOutput"
+          $acrNameOutput = az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrName.value -o tsv
+          echo "##vso[task.setvariable variable=acrName]$acrNameOutput"
+          echo "ACR Name: $acrNameOutput"
 
     # - task: UseDotNet@2
     #   displayName: 'Use .NET SDK $(dotnetSdkVersion)'
