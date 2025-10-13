@@ -3,10 +3,10 @@ param keyVaultName string
 @secure()
 param adminPasswordOrKey string
 
-resource scriptIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'script-identity'
-  location: location
-}
+// resource scriptIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+//   name: 'script-identity'
+//   location: location
+// }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
