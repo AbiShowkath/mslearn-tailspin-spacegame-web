@@ -19,8 +19,8 @@ variables:
 
   # Bicep files
   deploymentName: 'main_linux'
-  templateFile: 'bicep/$(deploymentName).bicep'
-  csmParametersFile: 'bicep/$(deploymentName).bicepparam'
+  templateFile: 'pipeline/bicep/$(deploymentName).bicep'
+  csmParametersFile: 'pipeline/bicep/$(deploymentName).bicepparam'
 
   # These will be populated after deployment
   acrName: ''
