@@ -85,11 +85,11 @@ jobs:
     # - task: Docker@2
     #   displayName: 'Build Docker image'
     #   inputs:
-    #     command: buildAndPush
     #     containerRegistry: 'spacegameacr002'
+    #     command: buildAndPush
+    #     repository: 'tailspin-spacegame-web'
     #     Dockerfile: './Dockerfile'
     #     tags: |
     #       $(Build.BuildId)
-    #     repository: 'tailspin-spacegame-web'
     #     buildContext: .
     #     arguments: '--pull'
