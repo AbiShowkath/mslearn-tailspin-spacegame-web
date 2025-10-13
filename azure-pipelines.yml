@@ -63,13 +63,14 @@ steps:
       displayName: 'Get Outputs'
       inputs:
         azureSubscription: '${{ parameters.serviceConnection }}'
-        scriptType: 'ps'
+        scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          $vmNameOutput = az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.vmName.value -o tsv
+          az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs
+          vmNameOutput=$(az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.vmName.value -o tsv)
           echo "##vso[task.setvariable variable=vmName]$vmNameOutput"
           echo "VM Name: $vmNameOutput"
-          $acrNameOutput = az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrName.value -o tsv
+          acrNameOutput=$(az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrName.value -o tsv)
           echo "##vso[task.setvariable variable=acrName]$acrNameOutput"
           echo "ACR Name: $acrNameOutput"
 

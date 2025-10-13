@@ -49,10 +49,10 @@ param networkSecurityGroupName string = 'SecGroupNet'
 ])
 param securityType string = 'TrustedLaunch'
 
-// @minLength(5)
-// @maxLength(50)
-// @description('Provide a globally unique name of your Azure Container Registry')
-// param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
+@minLength(5)
+@maxLength(50)
+@description('Provide a globally unique name of your Azure Container Registry')
+param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
 
 @description('Allocation method for the Public IP used to access the Virtual Machine.')
 param publicIPAllocationMethod string = 'Static'
@@ -60,43 +60,11 @@ param publicIPAllocationMethod string = 'Static'
 @description('SKU for the Public IP used to access the Virtual Machine.')
 param publicIpSku string = 'Standard'
 
-// var imageReference = {
-//   'Ubuntu-2004': {
-//     publisher: 'Canonical'
-//     offer: '0001-com-ubuntu-server-focal'
-//     sku: '20_04-lts-gen2'
-//     version: 'latest'
-//   }
-//   'Ubuntu-2204': {
-//     publisher: 'Canonical'
-//     offer: '0001-com-ubuntu-server-jammy'
-//     sku: '22_04-lts-gen2'
-//     version: 'latest'
-//   }
-// }
 var publicIPAddressName = '${vmName}PublicIP'
 var networkInterfaceName = '${vmName}NetInt'
 var osDiskType = 'Standard_LRS'
 var subnetAddressPrefix = '10.1.0.0/24'
 var addressPrefix = '10.1.0.0/16'
-// var linuxConfiguration = {
-//   disablePasswordAuthentication: true
-//   ssh: {
-//     publicKeys: [
-//       {
-//         path: '/home/${adminUsername}/.ssh/authorized_keys'
-//         keyData: adminPasswordOrKey
-//       }
-//     ]
-//   }
-// }
-// var securityProfileJson = {
-//   uefiSettings: {
-//     secureBootEnabled: true
-//     vTpmEnabled: true
-//   }
-//   securityType: securityType
-// }
 var extensionName = 'GuestAttestation'
 var extensionPublisher = 'Microsoft.Azure.Security.LinuxAttestation'
 var extensionVersion = '1.0'
@@ -156,47 +124,17 @@ module compute 'modules/compute.bicep' = {
   }
 }
 
-// resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
-//   name: networkInterfaceName
-//   location: location
-//   properties: {
-//     ipConfigurations: [
-//       {
-//         name: 'ipconfig1'
-//         properties: {
-//           subnet: {
-//             id: networkSubnetId
-//           }
-//           privateIPAllocationMethod: 'Dynamic'
-//           publicIPAddress: {
-//             id: publicIPAddress.id
-//           }
-//         }
-//       }
-//     ]
-//     networkSecurityGroup: {
-//       id: networkSecurityGroupId
-//     }
-//   }
-// }
-
-// resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
-//   name: publicIPAddressName
-//   location: location
-//   sku: {
-//     name: publicIpSku
-//   }
-//   properties: {
-//     publicIPAllocationMethod: publicIPAllocationMethod
-//     dnsSettings: {
-//       domainNameLabel: dnsLabelPrefix
-//     }
-//   }
-// }
+module acrResource 'modules/acr.bicep' = {
+  name: 'acrModule'
+  params: {
+    location: location
+    acrName: acrName
+  }
+}
 
 output vmId string = compute.outputs.vmId
 output vmName string = compute.outputs.vmName
-// output acrName string = acrResource.name
+output acrName string = acrResource.name
 output adminUsername string = adminUsername
 output hostname string = publicIPAddress
 output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress}'
