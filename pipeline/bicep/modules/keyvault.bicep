@@ -13,18 +13,18 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   location: location
   properties: {
     accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: scriptIdentity.properties.principalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-            'set'
-            'delete'
-          ]
-        }
-      }
+      // {
+      //   tenantId: tenant().tenantId
+      //   objectId: scriptIdentity.properties.principalId
+      //   permissions: {
+      //     secrets: [
+      //       'get'
+      //       'list'
+      //       'set'
+      //       'delete'
+      //     ]
+      //   }
+      // }
     ]
     enabledForTemplateDeployment: true
     enableSoftDelete: false
@@ -32,7 +32,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       family: 'A'
       name: 'standard'
     }
-    tenantId: subscription().tenantId
+    tenantId: tenant().tenantId
   }
 }
 
