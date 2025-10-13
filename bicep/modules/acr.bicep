@@ -11,3 +11,5 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
     adminUserEnabled: true
   }
 }
+
+output acrLoginServer string = acr.properties.loginServer
