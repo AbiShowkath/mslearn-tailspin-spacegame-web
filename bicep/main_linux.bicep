@@ -15,7 +15,7 @@ param authenticationType string = 'password'
 
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
-param adminPasswordOrKey string
+param adminPasswordOrKey string = newGuid()
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
 param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
@@ -129,6 +129,15 @@ module acrResource 'modules/acr.bicep' = {
   params: {
     location: location
     acrName: acrName
+  }
+}
+
+module keyvaultResource 'modules/keyvault.bicep' = {
+  name: 'keyvaultModule'
+  params: {
+    location: location
+    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id)}'
+    adminPasswordOrKey: adminPasswordOrKey
   }
 }
 

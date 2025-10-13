@@ -43,7 +43,10 @@ parameters:
   type: string
   default: azure-subscription-1
 
-steps:
+jobs:
+- job: DeployBicep
+  displayName: 'Deploy Bicep Template to Azure'  
+  steps:
     - task: AzureResourceManagerTemplateDeployment@3
       displayName: 'Deploy Bicep Template'
       inputs:
@@ -66,13 +69,12 @@ steps:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs
           vmNameOutput=$(az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.vmName.value -o tsv)
           echo "##vso[task.setvariable variable=vmName]$vmNameOutput"
-          echo "VM Name: $vmNameOutput"
+          echo "VM Name: $(vmName)"
           acrNameOutput=$(az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrName.value -o tsv)
           echo "##vso[task.setvariable variable=acrName]$acrNameOutput"
-          echo "ACR Name: $acrNameOutput"
+          echo "ACR Name: $(acrName)"
 
     # - task: UseDotNet@2
     #   displayName: 'Use .NET SDK $(dotnetSdkVersion)'

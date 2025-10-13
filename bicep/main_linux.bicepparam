@@ -5,7 +5,6 @@ param namePrefix = 'spacegame'
 param vmName = '${namePrefix}VM'
 param adminUsername = 'abishowkathlinuxuser'
 param authenticationType = 'password'
-param adminPasswordOrKey = 'abishowkathaz@4321'
 param dnsLabelPrefix = toLower('${namePrefix}dns')
 param ubuntuOSVersion = 'Ubuntu-2204'
 param vmSize = 'Standard_B1s'
