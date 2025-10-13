@@ -1,7 +1,7 @@
 param location string
 param acrName string
 
-resource acr 'Microsoft.ContainerRegistry/registries@2023-09-01' = {
+resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: acrName
   location: location
   sku: {
