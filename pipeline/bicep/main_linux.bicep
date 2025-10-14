@@ -18,7 +18,7 @@ param authenticationType string = 'password'
 param adminPasswordOrKey string = newGuid()
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
-param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
+param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id, currentUtc)}')
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
 @allowed([
@@ -139,14 +139,14 @@ module keyvaultResource 'modules/keyvault.bicep' = {
   name: 'keyvaultModule'
   params: {
     location: location
-    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id)}'
+    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id, currentUtc)}'
     adminPasswordOrKey: adminPasswordOrKey
   }
 }
 
-output vmId string = compute.outputs.vmId
+// output vmId string = compute.outputs.vmId
 output vmName string = compute.outputs.vmName
 output acrLoginServer string = acrResource.outputs.acrLoginServer
 output adminUsername string = adminUsername
-output hostname string = publicIPAddress
-output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress}'
+// output hostname string = publicIPAddress
+// output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress}'

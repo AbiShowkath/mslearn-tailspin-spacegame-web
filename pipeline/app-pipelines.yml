@@ -1,10 +1,15 @@
 trigger:
-- 'app-pipeline-setup'
+- 'app-pipeline-setup-1'
+
+resources:
+  pipelines:
+  - pipeline: infraPipeline  # Name of the pipeline resource
+    source: infra-pipeline     # Name of the pipeline in Azure DevOps
+    trigger: true              # Enable triggering on completion of the referenced pipeline
 
 name: Build and Push Docker Image
 
 variables:
-  namePrefix: 'spacewebgame'
   vmImageName: 'ubuntu-latest'
 
   system.debug: true
@@ -14,13 +19,10 @@ variables:
   dotnetSdkVersion: '8.0.x'
 
   # Azure Resource Variables
-  resourceGroupName: $(namePrefix)RG
   location: 'eastus'
 
   # Bicep files
   deploymentName: 'main_linux'
-  templateFile: 'bicep/$(deploymentName).bicep'
-  csmParametersFile: 'bicep/$(deploymentName).bicepparam'
   acrName: ''
   vmName: ''
   hostname: ''

@@ -1,9 +1,9 @@
 trigger:
   branches:
     include:
-      - 'infra-pipeline-setup'
+      - 'infra-pipeline-setup-1'
 
-name: 'infra-$(Date:yyyyMMdd)$(Rev:.r)'
+name: 'infraPipeline'
 
 variables:
   environment: 'dev'
@@ -12,6 +12,8 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   system.debug: true
+
+  buildConfiguration: 'Release'
 
   # Azure Resource Variables
   resourceGroupName: $(namePrefix)RG
