@@ -132,14 +132,14 @@ module acrResource 'modules/acr.bicep' = {
   }
 }
 
-// @description('Current UTC time for unique Key Vault naming.')
-// param currentUtc string = utcNow()
+@description('Current UTC time for unique Key Vault naming.')
+param currentUtc string = utcNow()
 
 module keyvaultResource 'modules/keyvault.bicep' = {
   name: 'keyvaultModule'
   params: {
     location: location
-    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id)}'
+    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id, currentUtc)}'
     adminPasswordOrKey: adminPasswordOrKey
   }
 }

@@ -11,7 +11,7 @@ variables:
   namePrefix: 'spacewebgame'
   vmImageName: 'ubuntu-latest'
 
-  # system.debug: true
+  system.debug: true
 
   # Azure Resource Variables
   resourceGroupName: $(namePrefix)RG
