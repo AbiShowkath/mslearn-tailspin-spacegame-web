@@ -14,7 +14,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   properties: {
     accessPolicies: [
       {
-        tenantId: tenant().tenantId
+        tenantId: subscription().tenantId
         objectId: scriptIdentity.properties.principalId
         permissions: {
           secrets: [
@@ -27,12 +27,16 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       }
     ]
     enabledForTemplateDeployment: true
+    enableRbacAuthorization: true
     enableSoftDelete: false
+    softDeleteRetentionInDays: 7
+    enabledForDeployment: false
+    enabledForDiskEncryption: false
     sku: {
       family: 'A'
       name: 'standard'
     }
-    tenantId: tenant().tenantId
+    tenantId: subscription().tenantId
   }
 }
 

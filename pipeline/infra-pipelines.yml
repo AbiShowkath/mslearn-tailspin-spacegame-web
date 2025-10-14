@@ -8,7 +8,7 @@ name: 'infra-$(Date:yyyyMMdd)$(Rev:.r)'
 variables:
   environment: 'dev'
 
-  namePrefix: 'spacewebgame'
+  namePrefix: 'spacegame'
   vmImageName: 'ubuntu-latest'
 
   system.debug: true

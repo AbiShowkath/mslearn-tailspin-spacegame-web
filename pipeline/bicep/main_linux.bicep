@@ -139,7 +139,7 @@ module keyvaultResource 'modules/keyvault.bicep' = {
   name: 'keyvaultModule'
   params: {
     location: location
-    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id, currentUtc)}'
+    keyVaultName: '${namePrefix}kv${uniqueString(resourceGroup().id)}'
     adminPasswordOrKey: adminPasswordOrKey
   }
 }
