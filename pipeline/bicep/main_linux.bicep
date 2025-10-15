@@ -124,11 +124,17 @@ module compute 'modules/compute.bicep' = {
   }
 }
 
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: 'spaceGameIdentity'
+  location: location
+}
+
 module acrResource 'modules/acr.bicep' = {
   name: 'acrModule'
   params: {
     location: location
     acrName: acrName
+    // userAssignedIdentityId: userAssignedIdentity.id
   }
 }
 
