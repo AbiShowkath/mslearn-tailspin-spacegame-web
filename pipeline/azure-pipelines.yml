@@ -78,9 +78,6 @@ stages:
   displayName: 'Build and Push Docker Image'
   dependsOn: Create_Update_ACR
   variables:
-    stageDeps: $[stageDependencies]
-    stageDepsStage: $[stageDependencies.Create_Update_ACR]
-    stageDepsStageOutputs: $[stageDependencies.Create_Update_ACR.outputs]
     acrName: $[stageDependencies.Create_Update_ACR.outputs['DeployACRBicep.GetACROutputs.acrName']]
   jobs:
   - job: BuildAndPushDockerImage
@@ -89,9 +86,6 @@ stages:
       vmImage: $(vmImageName)
     steps:
       - bash: |
-          echo "Stage 2 ACR Name: $(stageDeps)"
-          echo "Stage 2 ACR Name: $(stageDepsStage)"
-          echo "Stage 2 ACR Name: $(stageDepsStageOutputs)"
           echo "Stage 2 ACR Name: $(acrName)"
 
       - task: UseDotNet@2
