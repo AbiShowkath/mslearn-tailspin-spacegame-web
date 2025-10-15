@@ -77,7 +77,6 @@ stages:
   dependsOn: Create_Update_ACR
   jobs:
   - job: BuildAndPushDockerImage
-    dependsOn: DeployACRBicep
     displayName: 'Build and Push Docker Image'
     pool:
       vmImage: $(vmImageName)
@@ -109,6 +108,7 @@ stages:
 
 - stage: Create_Update_ACI
   displayName: 'Create or Update and Start ACI via Bicep'
+  dependsOn: Build_and_Push_Docker_Image
   jobs:
   - job: DeployACIBicep
     displayName: 'Deploy ACI Bicep Template to Azure'
