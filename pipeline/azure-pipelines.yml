@@ -86,10 +86,16 @@ stages:
       acrName: $[stageDependencies.DeployACRBicep.outputs['DeployACRBicep.GetACROutputs.acrName']]
     steps:
       - bash: |
-          echo "Stage 1 dependencies: $[stageDependencies])"
+          echo "Stage 1 Stage dependencies: $[stageDependencies]"
           echo "Stage 1 DeployACRBicep: $[stageDependencies.Create_Update_ACR]"
-          echo "Stage 1 Outputs: $[stageDependencies.Create_Update_ACR.outputs])"
-          echo "Stage 1 ACR Name: $[stageDependencies.Create_Update_ACR.outputs['DeployACRBicep.GetACROutputs.acrName']])"
+          echo "Stage 1 Outputs: $[stageDependencies.Create_Update_ACR.DeployACRBicep.outputs]"
+          echo "Stage 1 ACR Name: $[stageDependencies.Create_Update_ACR.DeployACRBicep.outputs['GetACROutputs.acrName']]"
+
+          echo "Stage 1 dependencies: $[dependencies]"
+          echo "Stage 1 DeployACRBicep: $[dependencies.Create_Update_ACR]"
+          echo "Stage 1 Outputs: $[dependencies.Create_Update_ACR.outputs]"
+          echo "Stage 1 ACR Name: $[dependencies.Create_Update_ACR.outputs['DeployACRBicep.GetACROutputs.acrName']]"
+
           echo "Stage 2 ACR Name: $(acrName)"
 
       - task: UseDotNet@2
