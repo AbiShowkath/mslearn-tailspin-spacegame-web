@@ -63,6 +63,7 @@ stages:
       
       - task: AzureCLI@2
         displayName: 'Get Outputs'
+        name: GetACROutputs
         inputs:
           azureSubscription: '${{ parameters.serviceConnection }}'
           scriptType: 'bash'
@@ -70,8 +71,13 @@ stages:
           inlineScript: |
             acrNameOutput=$(az deployment group show --name $(acRDeploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrLoginServer.value -o tsv)
             echo "Stage 1 ACR Output Name: $acrNameOutput"
-            echo "##vso[task.setvariable variable=acrName]$acrNameOutput"
-            echo "Stage 1 ACR Name: $(acrName)"
+            echo "##vso[task.setvariable variable=acrName;isOutput=true]$acrNameOutput"
+            echo "##vso[task.setvariable variable=acrNameOutput;isOutput=true]$acrNameOutput"
+      - bash: |
+          echo "Stage 1 ACR Name: $(acrName)"
+          echo "Stage 1 ACR Name: $(acrNameOutput)"
+          echo "Stage 1 ACR Name: $(GetACROutputs.acrName)"
+          echo "Stage 1 ACR Name: $(GetACROutputs.acrNameOutput)"
 
 - stage: Build_and_Push_Docker_Image
   displayName: 'Build and Push Docker Image'
@@ -94,7 +100,7 @@ stages:
           command: 'build'
           Dockerfile: './Dockerfile'
           repository: '$(repositoryName)'
-          tags: $(acrName)/$(repositoryName):$(Build.BuildId)
+          tags: $(acrName)/$(Build.BuildId)
 
       - task: AzureCLI@2
         displayName: 'Login to ACR'
