@@ -78,7 +78,8 @@ stages:
   displayName: 'Build and Push Docker Image'
   dependsOn: Create_Update_ACR
   variables:
-    acrName: $[stageDependencies.Create_Update_ACR.outputs['DeployACRBicep.GetACROutputs.acrName']]
+    acrName: $[stageDependencies.Create_Update_ACR.DeployACRBicep.outputs['GetACROutputs.acrName']]
+    acr: $[dependencies.Create_Update_ACR.outputs['DeployACRBicep.GetACROutputs.acrName']]
   jobs:
   - job: BuildAndPushDockerImage
     displayName: 'Build and Push Docker Image'
@@ -100,7 +101,8 @@ stages:
           command: 'build'
           Dockerfile: './Dockerfile'
           repository: '$(repositoryName)'
-          tags: $(acrName)/$(Build.BuildId)
+          tags: |
+            $(Build.BuildId)
 
       - bash: |
           echo "Stage 2 Build id: $(Build.BuildId)"
@@ -116,7 +118,8 @@ stages:
           inlineScript: |
             echo "Stage 2 ACR Name: $(acrName)"
             az acr login -n $(acrName)
-            docker push $(acrName)/$(Build.BuildName)
+            docker tag $(repositoryName):$(Build.BuildId) $(acrName)/$(repositoryName):latest
+            docker push $(acrName)/$(repositoryName):latest
 
 - stage: Create_Update_ACI
   displayName: 'Create or Update and Start ACI via Bicep'
