@@ -29,7 +29,6 @@ variables:
   acICsmParametersFile: 'pipeline/bicep/$(acIDeploymentName).bicepparam'
 
   # These will be populated after deployment
-  acrName: ''
   repositoryName: 'tailspin-spacegame-web'
 
 parameters:
@@ -72,12 +71,8 @@ stages:
             acrNameOutput=$(az deployment group show --name $(acRDeploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrLoginServer.value -o tsv)
             echo "Stage 1 ACR Output Name: $acrNameOutput"
             echo "##vso[task.setvariable variable=acrName;isOutput=true]$acrNameOutput"
-            echo "##vso[task.setvariable variable=acrNameOutput;isOutput=true]$acrNameOutput"
       - bash: |
-          echo "Stage 1 ACR Name: $(acrName)"
-          echo "Stage 1 ACR Name: $(acrNameOutput)"
           echo "Stage 1 ACR Name: $(GetACROutputs.acrName)"
-          echo "Stage 1 ACR Name: $(GetACROutputs.acrNameOutput)"
 
 - stage: Build_and_Push_Docker_Image
   displayName: 'Build and Push Docker Image'
@@ -87,7 +82,13 @@ stages:
     displayName: 'Build and Push Docker Image'
     pool:
       vmImage: $(vmImageName)
+    variables:
+      acrName: $(dependencies.Create_Update_ACR.outputs['Create_Update_ACR.GetACROutputs.acrName'])
     steps:
+      - bash: |
+          echo "Stage 1 Outputs: $(dependencies.Create_Update_ACR.outputs)"
+          echo "Stage 2 ACR Name: $(acrName)"
+
       - task: UseDotNet@2
         displayName: 'Use .NET SDK 8.0.x'
         inputs:
@@ -102,6 +103,11 @@ stages:
           repository: '$(repositoryName)'
           tags: $(acrName)/$(Build.BuildId)
 
+      - bash: |
+          echo "Stage 2 Build id: $(Build.BuildId)"
+          echo "Stage 2 Build uri: $(Build.BuildUri)"
+          echo "Stage 2 Build number: $(Build.BuildNumber)"
+
       - task: AzureCLI@2
         displayName: 'Login to ACR'
         inputs:
@@ -111,7 +117,7 @@ stages:
           inlineScript: |
             echo "Stage 2 ACR Name: $(acrName)"
             az acr login -n $(acrName)
-            docker push $(acrName)/$(repositoryName)
+            docker push $(acrName)/$(Build.BuildName)
 
 - stage: Create_Update_ACI
   displayName: 'Create or Update and Start ACI via Bicep'
