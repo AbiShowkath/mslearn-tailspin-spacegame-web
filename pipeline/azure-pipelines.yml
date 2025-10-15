@@ -106,8 +106,6 @@ stages:
 
       - bash: |
           echo "Stage 2 Build id: $(Build.BuildId)"
-          echo "Stage 2 Build uri: $(Build.BuildUri)"
-          echo "Stage 2 Build number: $(Build.BuildNumber)"
 
       - task: AzureCLI@2
         displayName: 'Login to ACR'
@@ -140,6 +138,7 @@ stages:
           templateLocation: 'Linked artifact'
           csmFile: '$(aciTemplateFile)'
           csmParametersFile: '$(aciCsmParametersFile)'
+          overrideParameters: '-acrName $(acrName) -repositoryName $(repositoryName)'
           deploymentMode: 'Incremental'
           deploymentName: '$(aciDeploymentName)'
           connectedServiceName: '${{ parameters.serviceConnection }}'
