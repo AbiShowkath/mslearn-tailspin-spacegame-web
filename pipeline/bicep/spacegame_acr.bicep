@@ -20,3 +20,4 @@ module acr 'modules/acr.bicep' = {
 }
 
 output acrLoginServer string = acr.outputs.acrLoginServer
+output acrName string = acr.outputs.acrName
