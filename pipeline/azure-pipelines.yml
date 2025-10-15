@@ -69,26 +69,19 @@ stages:
           scriptLocation: 'inlineScript'
           inlineScript: |
             acrNameOutput=$(az deployment group show --name $(acRDeploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrLoginServer.value -o tsv)
-            echo "Stage 1 ACR Output Name: $acrNameOutput"
             echo "##vso[task.setvariable variable=acrName;isOutput=true]$acrNameOutput"
-      - bash: |
-          echo "Stage 1 ACR Name: $(GetACROutputs.acrName)"
 
 - stage: Build_and_Push_Docker_Image
   displayName: 'Build and Push Docker Image'
   dependsOn: Create_Update_ACR
   variables:
     acrName: $[stageDependencies.Create_Update_ACR.DeployACRBicep.outputs['GetACROutputs.acrName']]
-    acr: $[dependencies.Create_Update_ACR.outputs['DeployACRBicep.GetACROutputs.acrName']]
   jobs:
   - job: BuildAndPushDockerImage
     displayName: 'Build and Push Docker Image'
     pool:
       vmImage: $(vmImageName)
     steps:
-      - bash: |
-          echo "Stage 2 ACR Name: $(acrName)"
-
       - task: UseDotNet@2
         displayName: 'Use .NET SDK 8.0.x'
         inputs:
@@ -104,9 +97,6 @@ stages:
           tags: |
             $(Build.BuildId)
 
-      - bash: |
-          echo "Stage 2 Build id: $(Build.BuildId)"
-
       - task: AzureCLI@2
         displayName: 'Login to ACR'
         inputs:
@@ -114,14 +104,17 @@ stages:
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            echo "Stage 2 ACR Name: $(acrName)"
             az acr login -n $(acrName)
             docker tag $(repositoryName):$(Build.BuildId) $(acrName)/$(repositoryName):latest
             docker push $(acrName)/$(repositoryName):latest
 
 - stage: Create_Update_ACI
   displayName: 'Create or Update and Start ACI via Bicep'
-  dependsOn: Build_and_Push_Docker_Image
+  dependsOn: 
+    - Create_Update_ACR
+    - Build_and_Push_Docker_Image
+  variables:
+    acrName: $[stageDependencies.Create_Update_ACR.DeployACRBicep.outputs['GetACROutputs.acrName']]
   jobs:
   - job: DeployACIBicep
     displayName: 'Deploy ACI Bicep Template to Azure'
