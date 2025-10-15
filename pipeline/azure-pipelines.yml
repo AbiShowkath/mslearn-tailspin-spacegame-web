@@ -68,7 +68,8 @@ stages:
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            acrNameOutput=$(az deployment group show --name $(deploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrLoginServer.value -o tsv)
+            acrNameOutput=$(az deployment group show --name $(acRDeploymentName) --resource-group $(resourceGroupName) --query properties.outputs.acrLoginServer.value -o tsv)
+            echo "Stage 1 ACR Output Name: $acrNameOutput"
             echo "##vso[task.setvariable variable=acrName]$acrNameOutput"
             echo "Stage 1 ACR Name: $(acrName)"
 
