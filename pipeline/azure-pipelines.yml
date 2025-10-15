@@ -83,10 +83,13 @@ stages:
     pool:
       vmImage: $(vmImageName)
     variables:
-      acrName: $(dependencies.Create_Update_ACR.outputs['Create_Update_ACR.GetACROutputs.acrName'])
+      acrName: $(dependencies.DeployACRBicep.outputs['DeployACRBicep.GetACROutputs.acrName'])
     steps:
       - bash: |
-          echo "Stage 1 Outputs: $(dependencies.Create_Update_ACR.outputs)"
+          echo "Stage 1 dependencies: $(dependencies)"
+          echo "Stage 1 DeployACRBicep: $(dependencies.DeployACRBicep)"
+          echo "Stage 1 Outputs: $(dependencies.DeployACRBicep.outputs)"
+          echo "Stage 1 ACR Name: $(dependencies.DeployACRBicep.outputs['DeployACRBicep.GetACROutputs.acrName'])"
           echo "Stage 2 ACR Name: $(acrName)"
 
       - task: UseDotNet@2
