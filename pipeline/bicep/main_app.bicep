@@ -43,7 +43,7 @@ output webAppDevName string = webAppDev.outputs.webSiteName
 module webAppStage 'modules/webApp.bicep' = {
   name: 'webAppStageModule'
   params: {
-    location: 'location'
+    location: location
     appServicePlanId: appServicePlanId
     webSiteName: toLower('${namePrefix}-webapp-staging-${webSiteName}')
     linuxFxVersion: linuxFxVersion
