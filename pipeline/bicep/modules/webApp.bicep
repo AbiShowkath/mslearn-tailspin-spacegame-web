@@ -9,6 +9,7 @@ resource appService 'Microsoft.Web/sites@2024-11-01' = {
   location: location
   properties: {
     serverFarmId: appServicePlanId
+    httpsOnly: true
     siteConfig: {
       linuxFxVersion: linuxFxVersion
     }

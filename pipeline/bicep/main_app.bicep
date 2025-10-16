@@ -19,7 +19,7 @@ param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
 module appService './modules/appService.bicep' = {
   name: 'appServiceModule'
   params: {
-    location: location
+    location: 'southindia'
     appServicePlanName: appServicePlanName
     skuName: skuName
     appServiceKind: appServiceKind
@@ -43,7 +43,7 @@ output webAppDevName string = webAppDev.outputs.webSiteName
 module webAppStage 'modules/webApp.bicep' = {
   name: 'webAppStageModule'
   params: {
-    location: location
+    location: 'location'
     appServicePlanId: appServicePlanId
     webSiteName: toLower('${namePrefix}-webapp-staging-${webSiteName}')
     linuxFxVersion: linuxFxVersion
