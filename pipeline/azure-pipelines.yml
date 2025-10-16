@@ -11,7 +11,7 @@ variables:
   vmImageName: 'ubuntu-latest'
   namePrefix: 'spacegame'
   resourceGroupName: $(namePrefix)RG
-  location: 'southindia'
+  location: 'eastus'
 
   # Bicep files
   deploymentName: 'main'
