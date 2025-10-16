@@ -116,26 +116,26 @@ stages:
     - Build
   condition:  succeeded()
   variables:
+    system.debug: true
     webAppDevName: $[stageDependencies.Infrastructure.DeployBicep.outputs['GetOutputs.webAppDevName']]
     acrName: $[stageDependencies.Infrastructure.DeployBicep.outputs['GetOutputs.acrName']]
   jobs:
-  - deployment: Deploy
+  - job: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: dev
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: AzureRmWebAppDeployment@4
-            displayName: 'Azure App Service Deploy: dev website'
-            inputs:
-              ConnectionType: 'AzureRM'
-              azureSubscription: ${{ parameters.serviceConnection }}
-              appType: 'webAppLinux'
-              WebAppName: '$(webAppDevName)'
-              DockerNamespace: '$(acrName).azurecr.io'
-              DockerRepository: '$(repositoryName):latest'
+    steps:
+    - script: |
+        echo "Deploying to Dev Environment - Web App: $(webAppDevName), ACR: $(acrName), Repository: $(repositoryName)"
+      displayName: 'Display deployment info'
+    - task: AzureRmWebAppDeployment@4
+      displayName: 'Azure App Service Deploy: dev website'
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: ${{ parameters.serviceConnection }}
+        appType: 'webAppLinux'
+        WebAppName: '$(webAppDevName)'
+        DockerNamespace: '$(acrName).azurecr.io'
+        DockerRepository: '$(repositoryName):latest'
 
 # - stage: 'Staging'
 #   displayName: 'Deploy to the staging environment'
