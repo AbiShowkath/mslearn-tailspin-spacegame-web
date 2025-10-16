@@ -1,6 +1,6 @@
 param namePrefix string = 'spacegame'
 param location string = resourceGroup().location
-param appServicePlanName string = '${namePrefix}-app-service-plan'
+param appServicePlanName string = '${namePrefix}-app-service-plan-${uniqueString(resourceGroup().id)}'
 param skuName string = 'B1'
 param appServiceKind string = 'linux'
 
