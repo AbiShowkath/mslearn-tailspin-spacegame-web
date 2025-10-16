@@ -19,7 +19,7 @@ param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
 module appService './modules/appService.bicep' = {
   name: 'appServiceModule'
   params: {
-    location: location
+    location: 'southindia'
     appServicePlanName: appServicePlanName
     skuName: skuName
     appServiceKind: appServiceKind
