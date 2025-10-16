@@ -13,8 +13,8 @@ variables:
   resourceGroupName: $(namePrefix)RG
   location: 'southindia'
   deploymentName: 'main'
-  templateFile: 'pipeline/bicep/${deploymentName}.bicep'
-  csmParametersFile: 'pipeline/bicep/${deploymentName}.bicepparam'
+  templateFile: 'pipeline/bicep/$(deploymentName).bicep'
+  csmParametersFile: 'pipeline/bicep/$(deploymentName).bicepparam'
 
 parameters:
 - name: serviceConnection
