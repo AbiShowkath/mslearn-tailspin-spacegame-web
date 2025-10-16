@@ -15,6 +15,7 @@ param linuxFxVersion string = 'DOTNETCORE:8.0'
 @description('Provide a globally unique name of your Azure Container Registry')
 param acrName string = '${namePrefix}acr${uniqueString(resourceGroup().id)}'
 
+
 module appService './modules/appService.bicep' = {
   name: 'appServiceModule'
   params: {
