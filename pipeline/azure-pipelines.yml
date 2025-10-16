@@ -116,7 +116,6 @@ stages:
     - Build
   condition:  succeeded()
   variables:
-    system.debug: true
     webAppDevName: $[stageDependencies.Infrastructure.DeployBicep.outputs['GetOutputs.webAppDevName']]
     acrName: $[stageDependencies.Infrastructure.DeployBicep.outputs['GetOutputs.acrName']]
   jobs:
@@ -128,9 +127,6 @@ stages:
       runOnce:
         deploy:
           steps:
-          - script: |
-              echo "Deploying to Dev Environment - Web App: $(webAppDevName), ACR: $(acrName), Repository: $(repositoryName)"
-            displayName: 'Display deployment info'
           - task: AzureRmWebAppDeployment@4
             displayName: 'Azure App Service Deploy: dev website'
             inputs:
@@ -143,24 +139,30 @@ stages:
 
 # - stage: 'Staging'
 #   displayName: 'Deploy to the staging environment'
-#   dependsOn: Dev
+#   dependsOn: 
+#     - Infrastructure
+#     - Build
+#     - Dev
+#   condition:  succeeded()
+#   variables:
+#     system.debug: true
+#     webAppStagingName: $[stageDependencies.Infrastructure.DeployBicep.outputs['GetOutputs.webAppStagingName']]
+#     acrName: $[stageDependencies.Infrastructure.DeployBicep.outputs['GetOutputs.acrName']]
 #   jobs:
 #   - deployment: Deploy
 #     pool:
 #       vmImage: $(vmImageName)
 #     environment: staging
-#     variables:
-#     - group: 'Release'
 #     strategy:
 #       runOnce:
 #         deploy:
 #           steps:
-#           - download: current
-#             artifact: drop
-#           - task: AzureWebApp@1
+#           - task: AzureRmWebAppDeployment@4
 #             displayName: 'Azure App Service Deploy: staging website'
 #             inputs:
+#               ConnectionType: 'AzureRM'
 #               azureSubscription: ${{ parameters.serviceConnection }}
-#               appType: 'webAppLinux'
-#               appName: '$(WebAppNameStaging)'
-#               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+#               appType: 'webAppContainer'
+#               WebAppName: '$(webAppStagingName)'
+#               DockerNamespace: '$(acrName).azurecr.io'
+#               DockerRepository: '$(repositoryName):latest'
