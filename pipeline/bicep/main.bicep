@@ -8,8 +8,7 @@ param appServiceKind string = 'linux'
 @maxLength(50)
 @description('Provide a globally unique suffix for the web app name')
 param webSiteName string = toLower('${uniqueString(resourceGroup().id)}')
-param linuxFxName string = 'DOTNETCORE'
-param linuxFxVersion string = '8.0'
+param linuxFxVersion string
 
 @minLength(5)
 @maxLength(50)
@@ -35,7 +34,6 @@ module webAppDev 'modules/webApp.bicep' = {
     location: location
     appServicePlanId: appServicePlanId
     webSiteName: toLower('${namePrefix}-webapp-dev-${webSiteName}')
-    linuxFxName: linuxFxName
     linuxFxVersion: linuxFxVersion
   }
 }
@@ -48,7 +46,6 @@ module webAppStage 'modules/webApp.bicep' = {
     location: location
     appServicePlanId: appServicePlanId
     webSiteName: toLower('${namePrefix}-webapp-staging-${webSiteName}')
-    linuxFxName: linuxFxName
     linuxFxVersion: linuxFxVersion
   }
 }
