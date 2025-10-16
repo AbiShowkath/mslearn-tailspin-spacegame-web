@@ -14,7 +14,7 @@ variables:
   location: 'southindia'
 
   # Bicep files
-  deploymentName: 'main'
+  deploymentName: 'main_app'
   templateFile: 'pipeline/bicep/$(deploymentName).bicep'
   csmParametersFile: 'pipeline/bicep/$(deploymentName).bicepparam'
 
