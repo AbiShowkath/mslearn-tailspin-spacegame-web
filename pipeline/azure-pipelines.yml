@@ -12,9 +12,14 @@ variables:
   namePrefix: 'spacegame'
   resourceGroupName: $(namePrefix)RG
   location: 'southindia'
+
+  # Bicep files
   deploymentName: 'main'
   templateFile: 'pipeline/bicep/$(deploymentName).bicep'
   csmParametersFile: 'pipeline/bicep/$(deploymentName).bicepparam'
+
+  # These will be populated after deployment
+  repositoryName: 'tailspin-spacegame-web'
 
 parameters:
 - name: serviceConnection
